@@ -1,23 +1,5 @@
+import { MongoClient } from "mongodb";
 import MeetupList from "../components/meetups/MeetupList";
-
-const DUMMY_MEETUPS = [
-  {
-    id: "m2",
-    title: "First Meetup",
-    image:
-      "https://imagens.itforum.com.br/itforum.com.br/wp-content/uploads/2020/02/Sao-Paulo-e-a-terceira-cidade-do-mundo-que-mais-sera-impactada-pela-mobilidade.jpg",
-    address: "Avenida Paulista, 1200 - São Paulo",
-    description: "Nosso primeiro Meetup",
-  },
-  {
-    id: "m12",
-    title: "Second Meetup",
-    image:
-      "https://files.tecnoblog.net/wp-content/uploads/2020/03/rio-de-janeiro.jpg",
-    address: "Copacabana, 1200 - Rio de Janeiro",
-    description: "Nosso segundo Meetup",
-  },
-];
 
 function Home(props) {
   return <MeetupList meetups={props.meetups} />;
@@ -34,9 +16,23 @@ function Home(props) {
 // }
 
 export async function getStaticProps() {
+  const client = await MongoClient.connect(
+    "mongodb+srv://lucasneves:PMFtmHxjb19MYRLk@sandbox.fflys.mongodb.net/test?retryWrites=true&w=majority"
+  );
+  const db = client.db();
+
+  const meetupsCollection = db.collection("meetups");
+
+  const meetups = await meetupsCollection.find().toArray();
+  client.close();
   return {
     props: {
-      meetups: DUMMY_MEETUPS
+      meetups: meetups.map((meetup) => ({
+        title: meetup.title,
+        image: meetup.image,
+        address: meetup.address,
+        id: meetup._id.toString()
+      }))
     },
     revalidate: 10
   }
