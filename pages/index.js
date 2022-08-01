@@ -1,19 +1,17 @@
 import { MongoClient } from "mongodb";
 import MeetupList from "../components/meetups/MeetupList";
+import Head from "next/head";
 
 function Home(props) {
-  return <MeetupList meetups={props.meetups} />;
+  return (
+    <>
+      <Head>
+        <title>React Meetups</title>
+      </Head>
+      <MeetupList meetups={props.meetups} />;
+    </>
+  );
 }
-
-// export async function getServerSideProps(context) {
-//   const req = context.req;
-//   const res = context.res;
-//   return {
-//     props: {
-//       meetups: DUMMY_MEETUPS
-//     }
-//   }
-// }
 
 export async function getStaticProps() {
   const client = await MongoClient.connect(
@@ -31,10 +29,10 @@ export async function getStaticProps() {
         title: meetup.title,
         image: meetup.image,
         address: meetup.address,
-        id: meetup._id.toString()
-      }))
+        id: meetup._id.toString(),
+      })),
     },
-    revalidate: 10
-  }
+    revalidate: 10,
+  };
 }
 export default Home;
